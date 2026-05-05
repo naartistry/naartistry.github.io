@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — NA Artistry</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Cormorant+Garamond:wght@400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --black: #000000;
+            --white: #FFFFFF;
+            --gray-dark: #111111;
+            --gray-mid: #222222;
+            --gray-light: #333333;
+            --accent: #FFFFFF;
+            --font-display: 'Cormorant Garamond', serif;
+            --font-body: 'DM Sans', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--black);
+            color: var(--white);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ── LOGIN ── */
+        #login-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--black);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-box {
+            background: var(--gray-dark);
+            padding: 3rem;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid var(--gray-mid);
+        }
+
+        .login-box h1 {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--black);
+            border: 1px solid var(--gray-mid);
+            color: var(--white);
+            margin-bottom: 1rem;
+            font-family: inherit;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--white);
+            color: var(--black);
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        /* ── DASHBOARD ── */
+        .dashboard {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: var(--gray-dark);
+            border-right: 1px solid var(--gray-mid);
+            height: 100vh;
+            position: fixed;
+            padding: 2rem 0;
+        }
+
+        .sidebar-brand {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            padding: 0 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .nav-item {
+            padding: 0.8rem 2rem;
+            cursor: pointer;
+            color: #888;
+            transition: color 0.2s, background 0.2s;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--white);
+            background: var(--gray-mid);
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 4rem;
+            max-width: 900px;
+        }
+
+        .section-editor {
+            display: none;
+        }
+
+        .section-editor.active {
+            display: block;
+        }
+
+        h2 {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .field-group {
+            margin-bottom: 2rem;
+            background: var(--gray-dark);
+            padding: 2rem;
+            border: 1px solid var(--gray-mid);
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #888;
+            margin-bottom: 0.5rem;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--black);
+            border: 1px solid var(--gray-mid);
+            color: var(--white);
+            font-family: inherit;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .actions {
+            margin-top: 3rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-save {
+            background: var(--white);
+            color: var(--black);
+            width: auto;
+            padding: 1rem 3rem;
+        }
+
+        .btn-reset {
+            background: transparent;
+            border: 1px solid var(--gray-mid);
+            color: #888;
+            width: auto;
+            padding: 1rem 2rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #27ae60;
+            color: white;
+            padding: 1rem 2rem;
+            transform: translateY(100px);
+            transition: transform 0.3s;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="login-overlay">
+        <div class="login-box">
+            <h1>NA Admin</h1>
+            <input type="password" id="admin-pass" placeholder="Password">
+            <button onclick="login()">Enter Dashboard</button>
+            <p id="login-error" style="color: #e74c3c; font-size: 0.8rem; margin-top: 1rem; display: none;">Incorrect password</p>
+        </div>
+    </div>
+
+    <div class="dashboard" id="dashboard">
+        <div class="sidebar" id="sidebar-nav">
+            <!-- Dynamically generated -->
+        </div>
+
+        <div class="main-content">
+            <div style="margin-bottom: 2rem;">
+                <input type="text" id="search-bar" placeholder="Search content keys..." onkeyup="filterFields()" style="background: var(--gray-dark); border: 1px solid var(--gray-mid); border-radius: 4px; max-width: 400px;">
+            </div>
+            
+            <div id="main-sections">
+                <!-- Dynamically generated -->
+            </div>
+
+            <div class="actions">
+                <button class="btn-save" onclick="saveAll()">Save Changes</button>
+                <button class="btn-reset" onclick="resetDefaults()">Reset to Defaults</button>
+                <a href="index.html" target="_blank"
+                    style="color: #888; text-decoration: none; font-size: 0.8rem; align-self: center;">View Site ↗</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Changes saved successfully!</div>
+
+    <script>
+        const PAGES_TO_SCAN = ['index.html', 'projects.html'];
+        let cmsSchema = JSON.parse(localStorage.getItem('na_cms_schema')) || {};
+        let cmsContent = JSON.parse(localStorage.getItem('na_cms_content')) || {};
+
+        async function scanPages() {
+            let updated = false;
+            for (let page of PAGES_TO_SCAN) {
+                try {
+                    let res = await fetch(page);
+                    let html = await res.text();
+                    let parser = new DOMParser();
+                    let doc = parser.parseFromString(html, 'text/html');
+                    let els = doc.querySelectorAll('[data-edit]');
+                    els.forEach(el => {
+                        let key = el.getAttribute('data-edit');
+                        if (!cmsSchema[key]) {
+                            let section = key.includes('_') ? key.split('_')[0] : 'General';
+                            cmsSchema[key] = {
+                                default: el.innerHTML.trim(),
+                                section: section
+                            };
+                            updated = true;
+                        }
+                    });
+                } catch (e) {
+                    console.error('Error scanning ' + page, e);
+                }
+            }
+            if (updated) {
+                localStorage.setItem('na_cms_schema', JSON.stringify(cmsSchema));
+            }
+        }
+
+        function renderDashboard() {
+            // Group by section
+            let sections = {};
+            for (let key in cmsSchema) {
+                let sec = cmsSchema[key].section;
+                if (!sections[sec]) sections[sec] = [];
+                sections[sec].push({ key: key, default: cmsSchema[key].default });
+            }
+
+            let sidebar = document.getElementById('sidebar-nav');
+            let main = document.getElementById('main-sections');
+            
+            sidebar.innerHTML = '<div class="sidebar-brand">NA Artistry</div>';
+            main.innerHTML = '';
+
+            let first = true;
+            for (let sec in sections) {
+                // Sidebar item
+                let navItem = document.createElement('div');
+                navItem.className = 'nav-item' + (first ? ' active' : '');
+                navItem.innerText = sec;
+                navItem.onclick = () => showSection(sec);
+                sidebar.appendChild(navItem);
+
+                // Main section
+                let secDiv = document.createElement('div');
+                secDiv.id = 'section-' + sec;
+                secDiv.className = 'section-editor' + (first ? ' active' : '');
+                
+                let h2 = document.createElement('h2');
+                h2.innerText = sec.replace(/([A-Z])/g, ' $1').trim() + ' Section';
+                secDiv.appendChild(h2);
+
+                let fg = document.createElement('div');
+                fg.className = 'field-group';
+
+                sections[sec].forEach(field => {
+                    let label = document.createElement('label');
+                    // Create readable label from key
+                    let readableLabel = field.key.replace(sec + '_', '').replace(/_/g, ' ');
+                    label.innerText = readableLabel + ` (${field.key})`;
+                    
+                    let val = cmsContent[field.key] !== undefined ? cmsContent[field.key] : field.default;
+                    
+                    let input;
+                    if (val.length < 60 && !val.includes('<br>') && !val.includes('<p>')) {
+                        input = document.createElement('input');
+                        input.type = 'text';
+                    } else {
+                        input = document.createElement('textarea');
+                    }
+                    input.id = 'input-' + field.key;
+                    input.value = val;
+                    
+                    fg.appendChild(label);
+                    fg.appendChild(input);
+                });
+                
+                secDiv.appendChild(fg);
+                main.appendChild(secDiv);
+                first = false;
+            }
+            
+            // Logout
+            let logoutItem = document.createElement('div');
+            logoutItem.className = 'nav-item';
+            logoutItem.style.marginTop = '2rem';
+            logoutItem.style.color = '#e74c3c';
+            logoutItem.innerText = 'Logout';
+            logoutItem.onclick = logout;
+            sidebar.appendChild(logoutItem);
+        }
+
+        function showSection(id) {
+            document.querySelectorAll('.section-editor').forEach(s => s.classList.remove('active'));
+            let activeSec = document.getElementById('section-' + id);
+            if (activeSec) activeSec.classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(n => {
+                n.classList.remove('active');
+                if (n.innerText === id) n.classList.add('active');
+            });
+            // Clear search when switching sections to show everything
+            document.getElementById('search-bar').value = '';
+            filterFields();
+        }
+
+        function saveAll() {
+            for (let key in cmsSchema) {
+                let input = document.getElementById('input-' + key);
+                if (input) {
+                    cmsContent[key] = input.value;
+                }
+            }
+            localStorage.setItem('na_cms_content', JSON.stringify(cmsContent));
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function resetDefaults() {
+            if (confirm('Are you sure you want to reset all content to defaults? This cannot be undone.')) {
+                localStorage.removeItem('na_cms_content');
+                cmsContent = {};
+                renderDashboard();
+                saveAll();
+            }
+        }
+
+        function filterFields() {
+            let q = document.getElementById('search-bar').value.toLowerCase();
+            document.querySelectorAll('.field-group label').forEach(lbl => {
+                let input = lbl.nextElementSibling;
+                let text = lbl.innerText.toLowerCase() + " " + (input ? input.value.toLowerCase() : "");
+                let match = text.includes(q);
+                lbl.style.display = match ? 'block' : 'none';
+                if (input) input.style.display = match ? 'block' : 'none';
+            });
+            
+            // Show all sections if searching
+            if (q) {
+                document.querySelectorAll('.section-editor').forEach(s => s.classList.add('active'));
+            } else {
+                // If search is cleared, just show the active one in sidebar
+                let activeNav = document.querySelector('.nav-item.active');
+                if (activeNav && activeNav.innerText !== 'Logout') {
+                    showSection(activeNav.innerText);
+                }
+            }
+        }
+
+        // Init
+        async function login() {
+            const pass = document.getElementById('admin-pass').value;
+            if (pass === 'naartistry2025' || localStorage.getItem('na_admin_logged_in') === 'true') {
+                localStorage.setItem('na_admin_logged_in', 'true');
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'flex';
+                
+                // Scan pages for new keys
+                await scanPages();
+                
+                // If still empty, wait a bit or something is wrong
+                if (Object.keys(cmsSchema).length === 0) {
+                    alert("No editable fields detected yet. Visit the live site once to initialize them.");
+                } else {
+                    renderDashboard();
+                }
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('na_admin_logged_in');
+            location.reload();
+        }
+
+        window.onload = () => {
+            if (localStorage.getItem('na_admin_logged_in') === 'true') {
+                login();
+            }
+        };
+    </script>
+</body>
+
+</html>
