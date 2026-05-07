@@ -22,18 +22,20 @@
     }
 
     try {
+        await loadScript('https://cdn.tailwindcss.com');
         if (!window.React) {
             await loadScript('https://unpkg.com/react@18/umd/react.production.min.js');
             await loadScript('https://unpkg.com/react-dom@18/umd/react-dom.production.min.js');
         }
         if (!window.Moveable) {
-            await loadScript('https://unpkg.com/moveable@0.54.0/dist/moveable.min.js');
+            await loadScript('https://unpkg.com/moveable@0.53.0/dist/moveable.min.js');
         }
-        await loadScript('https://cdn.tailwindcss.com');
         
         console.log("NA Layout Editor: Dependencies verified.");
     } catch (e) {
         console.error("NA Layout Editor: Failed to load dependencies.", e);
+        // Fallback for Tailwind if scripts fail
+        if (!window.Tailwind) await loadScript('https://cdn.tailwindcss.com');
         return;
     }
 
@@ -119,7 +121,20 @@
                     className: `px-6 py-2 rounded-xl font-medium text-sm uppercase transition-all ${editMode ? 'bg-red-500 text-white' : 'bg-white text-black'}`
                 }, editMode ? 'Exit Layout' : 'Enter Layout Edit'),
                 editMode && window.React.createElement('div', { className: 'flex gap-2 border-l border-white/10 pl-4' },
-                    ['desktop', 'tablet', 'mobile'].map(bp => window.React.createElement('button', { key: bp, onClick: () => setBreakpoint(bp), className: `p-2 rounded-lg ${breakpoint === bp ? 'bg-white/20' : 'text-gray-500'}` }, bp[0].toUpperCase()))
+                    ['desktop', 'tablet', 'mobile'].map(bp => 
+                        window.React.createElement('button', {
+                            key: bp,
+                            onClick: () => setBreakpoint(bp),
+                            className: `p-2 rounded-lg transition-all ${breakpoint === bp ? 'bg-white/20 text-white' : 'text-gray-500 hover:text-gray-300'}`
+                        }, bp.charAt(0).toUpperCase())
+                    ),
+                    window.React.createElement('button', {
+                        onClick: () => {
+                            localStorage.removeItem('na_admin_logged_in');
+                            location.reload();
+                        },
+                        className: 'ml-4 p-2 text-red-500 hover:text-red-400 transition-all uppercase text-[0.65rem] tracking-widest font-bold'
+                    }, 'Logout')
                 )
             ),
             editMode && selectedKey && window.React.createElement('div', { className: 'absolute top-24 right-8 w-64 bg-black/90 backdrop-blur-xl border border-white/10 p-4 rounded-xl pointer-events-auto text-white' },
