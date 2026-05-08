@@ -5,26 +5,516 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Projects — NA Artistry</title>
-  <meta name="description" content="A curated collection of work by NA Artistry across graphic design, editorial, and 3D visualization." />
-  <meta name="keywords" content="Portfolio, Graphic Design Projects, 3D Rendering, Editorial Showcase, NA Artistry">
-  <meta name="author" content="NA Artistry">
-
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://naartistry.github.io/projects.html">
-  <meta property="og:title" content="Projects — NA Artistry">
-  <meta property="og:description" content="Explore our curated collection of graphic design, editorial, and 3D visualization work.">
-  <meta property="og:image" content="./LOGO.png">
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="./LOGO.png">
-  <link rel="apple-touch-icon" href="./LOGO.png">
-
+  <meta name="description"
+    content="A curated collection of work by NA Artistry across graphic design, editorial, and 3D visualization." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="./projects.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --black: #000;
+      --white: #FFF;
+      --gray-light: #F5F5F5;
+      --gray-mid: #E0E0E0;
+      --gray-soft: #888;
+      --gray-dark: #1A1A1A;
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+      --nav-h: 72px;
+      --ease: cubic-bezier(.25, .46, .45, .94);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--black);
+      color: var(--white);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--black);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--gray-soft);
+    }
+
+    /* Custom Cursor */
+    .cursor-dot {
+      position: fixed;
+      width: 8px;
+      height: 8px;
+      background: var(--white);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform .15s var(--ease), opacity .15s;
+      mix-blend-mode: difference;
+    }
+
+    .cursor-dot.hover {
+      transform: scale(4);
+      opacity: .6;
+    }
+
+    /* Nav */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 5vw;
+      z-index: 100;
+      background: rgba(0, 0, 0, .92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, .06);
+    }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .nav-back {
+      font-size: .78rem;
+      font-weight: 400;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .65);
+      text-decoration: none;
+      transition: color .25s;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .nav-back:hover {
+      color: var(--white);
+    }
+
+    /* Page Header */
+    .page-header {
+      padding: calc(var(--nav-h) + 6rem) 5vw 4rem;
+      max-width: 800px;
+    }
+
+    .page-header h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 6vw, 5.5rem);
+      font-weight: 300;
+      line-height: 1.05;
+      letter-spacing: -.01em;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp .9s .2s var(--ease) forwards;
+    }
+
+    .page-header p {
+      font-size: clamp(.9rem, 1.6vw, 1.05rem);
+      font-weight: 300;
+      color: rgba(255, 255, 255, .45);
+      line-height: 1.7;
+      max-width: 520px;
+      opacity: 0;
+      animation: fadeUp .9s .4s var(--ease) forwards;
+      text-align: justify;
+    }
+
+    /* Filters */
+    .filters {
+      padding: 0 5vw 3rem;
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp .9s .5s var(--ease) forwards;
+    }
+
+    .filter-btn {
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, .4);
+      font-family: var(--font-body);
+      font-size: .78rem;
+      font-weight: 400;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      cursor: pointer;
+      padding: .5rem 0;
+      position: relative;
+      transition: color .3s;
+    }
+
+    .filter-btn::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: var(--white);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .4s var(--ease);
+    }
+
+    .filter-btn.active,
+    .filter-btn:hover {
+      color: var(--white);
+    }
+
+    .filter-btn.active::after {
+      transform: scaleX(1);
+    }
+
+    /* Projects Grid */
+    .projects-grid {
+      padding: 0 5vw 6rem;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+
+    .project-card {
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      background: var(--gray-dark);
+      aspect-ratio: 16/9;
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity .6s var(--ease), transform .6s var(--ease);
+    }
+
+    .project-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .project-card.hidden {
+      display: none;
+    }
+
+    .project-card .card-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .6s var(--ease);
+    }
+
+    .project-card .card-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform .6s var(--ease);
+    }
+
+    .project-card:hover .card-img,
+    .project-card:hover .card-placeholder {
+      transform: scale(1.05);
+    }
+
+    .card-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, .7);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 2rem;
+      opacity: 0;
+      transition: opacity .35s var(--ease);
+    }
+
+    .project-card:hover .card-overlay {
+      opacity: 1;
+    }
+
+    .card-cat {
+      font-size: .65rem;
+      font-weight: 500;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .5);
+      margin-bottom: .5rem;
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: var(--white);
+      line-height: 1.2;
+      margin-bottom: .8rem;
+    }
+
+    .card-cta {
+      font-size: .72rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .6);
+    }
+
+    .card-arrow {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      width: 32px;
+      height: 32px;
+      border: 1px solid rgba(255, 255, 255, .3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-size: .9rem;
+      transform: rotate(-45deg) scale(.8);
+      opacity: 0;
+      transition: transform .3s var(--ease), opacity .3s;
+    }
+
+    .project-card:hover .card-arrow {
+      opacity: 1;
+      transform: rotate(0) scale(1);
+    }
+
+    /* Placeholder gradients */
+    .ph-1 {
+      background: linear-gradient(135deg, #111, #222 50%, #151515);
+    }
+
+    .ph-2 {
+      background: linear-gradient(135deg, #1a1a1a, #0d0d0d);
+    }
+
+    .ph-3 {
+      background: linear-gradient(135deg, #0f0f0f, #1e1e1e);
+    }
+
+    .ph-4 {
+      background: linear-gradient(135deg, #181818, #0a0a0a);
+    }
+
+    .ph-5 {
+      background: linear-gradient(135deg, #141414, #1c1c1c);
+    }
+
+    .ph-6 {
+      background: linear-gradient(135deg, #0e0e0e, #191919);
+    }
+
+    .p-art {
+      opacity: .12;
+      pointer-events: none;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .92);
+      backdrop-filter: blur(12px);
+      z-index: 500;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .4s var(--ease);
+      overflow-y: auto;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-close {
+      position: fixed;
+      top: 1.5rem;
+      right: 2rem;
+      z-index: 510;
+      background: none;
+      border: 1px solid rgba(255, 255, 255, .2);
+      color: var(--white);
+      width: 44px;
+      height: 44px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color .25s, transform .25s;
+    }
+
+    .modal-close:hover {
+      border-color: var(--white);
+      transform: rotate(90deg);
+    }
+
+    .modal-content {
+      max-width: 900px;
+      margin: 6rem auto 4rem;
+      padding: 0 5vw;
+    }
+
+    .modal-hero {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: var(--gray-dark);
+      margin-bottom: 3rem;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .modal-cat {
+      font-size: .65rem;
+      font-weight: 500;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .4);
+      margin-bottom: 1rem;
+    }
+
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 300;
+      margin-bottom: 1.5rem;
+      line-height: 1.1;
+    }
+
+    .modal-desc {
+      font-size: .95rem;
+      font-weight: 300;
+      color: rgba(255, 255, 255, .55);
+      line-height: 1.75;
+      max-width: 600px;
+      margin-bottom: 3rem;
+      text-align: justify;
+    }
+    
+    .modal-desc p {
+      margin-bottom: 1rem;
+    }
+    
+    .modal-desc ul {
+      margin-bottom: 1rem;
+      padding-left: 1.5rem;
+    }
+
+    .modal-gallery {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+
+    .modal-gallery-item {
+      aspect-ratio: 210/297; /* A4 size ratio */
+      background: var(--gray-dark);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--black);
+      border-top: 1px solid rgba(255, 255, 255, .07);
+      padding: 3rem 5vw;
+      text-align: center;
+    }
+
+    .footer-copy {
+      font-size: .75rem;
+      font-weight: 300;
+      color: rgba(255, 255, 255, .2);
+      text-align: justify;
+    }
+
+    /* Animations */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(28px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width:900px) {
+      .projects-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-gallery {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width:600px) {
+      .projects-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .filters {
+        gap: 1.2rem;
+      }
+
+      .page-header {
+        padding-top: calc(var(--nav-h) + 4rem);
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -32,8 +522,8 @@
 
   <!-- NAV -->
   <nav>
-    <a href="./index.html" class="nav-logo" data-edit="PortfolioNav_Logo">NA Artistry</a>
-    <a href="./index.html" class="nav-back" data-edit="PortfolioNav_Back">← Back to Home</a>
+    <a href="index.html" class="nav-logo" data-edit="PortfolioNav_Logo">NA Artistry</a>
+    <a href="index.html" class="nav-back" data-edit="PortfolioNav_Back">← Back to Home</a>
   </nav>
 
   <!-- HEADER -->
@@ -52,139 +542,320 @@
 
   <!-- GRID -->
   <div class="projects-grid" id="projectsGrid">
-    <!-- Projects will be injected by CMS, but we keep the structure for SEO/Fallback -->
-    <div class="project-card reveal" data-category="graphic-design" data-index="0" data-layout="Project_0">
-      <img src="./MOCKUP.jpg" class="card-img" alt="Minimal Identity System" loading="lazy">
+
+    <div class="project-card" data-category="graphic-design" data-index="0">
+      <img src="MOCKUP.jpg" class="card-img" alt="Minimal Identity System">
       <div class="card-overlay">
         <p class="card-cat" data-edit="PortfolioProject_0_Cat">Branding</p>
         <p class="card-title" data-edit="PortfolioProject_0_Title">Minimal Identity System</p>
         <p class="card-cta" data-edit="PortfolioProject_0_CTA">View Project →</p>
       </div>
       <div class="card-arrow">↗</div>
-      <div class="card-desc" style="display:none;" data-edit="PortfolioProject_0_Desc">Strategic brand identity system designed with precision and geometric clarity.</div>
-      <div class="card-gallery" style="display:none;" data-gallery="./MOCKUP.jpg"></div>
+      <div class="card-desc" style="display:none;" data-edit="PortfolioProject_0_Desc">A bold and structured logo inspired by the core elements of golf. Featuring a central ball and crossed clubs within a shield form, the design represents precision, strength, and tradition. Built with clean geometry and strong typography, the logo ensures clarity, versatility, and a consistent presence across all brand touchpoints.</div>
+      <div class="card-gallery" style="display:none;" data-gallery="Branding-01.jpg,Branding-02.jpg,Branding-03.jpg,Branding-04.jpg"></div>
+      <div class="card-ph" style="display:none;" data-ph="ph-1"></div>
     </div>
+
+    <div class="project-card" data-category="editorial" data-index="1">
+      <div class="card-placeholder ph-2">
+        <svg class="p-art" width="160" height="200" viewBox="0 0 160 200">
+          <rect x="15" y="15" width="130" height="170" stroke="white" stroke-width="1" fill="none" />
+          <rect x="25" y="25" width="110" height="25" fill="white" opacity=".5" />
+          <line x1="25" y1="65" x2="140" y2="65" stroke="white" stroke-width=".5" />
+          <line x1="25" y1="75" x2="120" y2="75" stroke="white" stroke-width=".5" />
+        </svg>
+      </div>
+      <div class="card-overlay">
+        <p class="card-cat" data-edit="PortfolioProject_1_Cat">Editorial</p>
+        <p class="card-title" data-edit="PortfolioProject_1_Title">Book Cover Design</p>
+        <p class="card-cta" data-edit="PortfolioProject_1_CTA">View Project →</p>
+      </div>
+      <div class="card-arrow">↗</div>
+      <div class="card-desc" style="display:none;" data-edit="PortfolioProject_1_Desc">A striking book cover designed with clarity and elegance. Clean typographic hierarchy, compelling imagery, and a cohesive layout system that turns content into a visually engaging narrative.</div>
+      <div class="card-gallery" style="display:none;" data-gallery=""></div>
+      <div class="card-ph" style="display:none;" data-ph="ph-2"></div>
+    </div>
+
+    <div class="project-card" data-category="3d-visual" data-index="2">
+      <div class="card-placeholder ph-3">
+        <svg class="p-art" width="160" height="180" viewBox="0 0 160 180">
+          <polygon points="80,15 145,50 145,130 80,165 15,130 15,50" stroke="white" stroke-width="1" fill="none" />
+          <polygon points="80,45 115,65 115,115 80,135 45,115 45,65" fill="white" opacity=".06" />
+        </svg>
+      </div>
+      <div class="card-overlay">
+        <p class="card-cat" data-edit="PortfolioProject_2_Cat">3D Visual</p>
+        <p class="card-title" data-edit="PortfolioProject_2_Title">Product Visualisation</p>
+        <p class="card-cta" data-edit="PortfolioProject_2_CTA">View Project →</p>
+      </div>
+      <div class="card-arrow">↗</div>
+      <div class="card-desc" style="display:none;" data-edit="PortfolioProject_2_Desc">Photorealistic 3D renders of consumer products before manufacturing. Each angle carefully lit and composed to showcase form, material, and detail at the highest fidelity.</div>
+      <div class="card-gallery" style="display:none;" data-gallery=""></div>
+      <div class="card-ph" style="display:none;" data-ph="ph-3"></div>
+    </div>
+
+    <div class="project-card" data-category="graphic-design" data-index="3">
+      <div class="card-placeholder ph-4">
+        <svg class="p-art" width="200" height="140" viewBox="0 0 200 140">
+          <rect x="10" y="10" width="80" height="120" stroke="white" stroke-width=".8" fill="none" />
+          <rect x="110" y="10" width="80" height="120" stroke="white" stroke-width=".8" fill="none" />
+          <rect x="25" y="25" width="50" height="7" fill="white" opacity=".4" />
+        </svg>
+      </div>
+      <div class="card-overlay">
+        <p class="card-cat" data-edit="PortfolioProject_3_Cat">Branding</p>
+        <p class="card-title" data-edit="PortfolioProject_3_Title">Corporate Brand Guidelines</p>
+        <p class="card-cta" data-edit="PortfolioProject_3_CTA">View Project →</p>
+      </div>
+      <div class="card-arrow">↗</div>
+      <div class="card-desc" style="display:none;" data-edit="PortfolioProject_3_Desc">A modular brand guideline document covering logo usage, typography, iconography, photography direction, and digital application rules — ensuring consistency across every touchpoint.</div>
+      <div class="card-gallery" style="display:none;" data-gallery=""></div>
+      <div class="card-ph" style="display:none;" data-ph="ph-4"></div>
+    </div>
+
+    <div class="project-card" data-category="graphic-design" data-index="4">
+      <div class="card-placeholder ph-5">
+        <svg class="p-art" width="120" height="150" viewBox="0 0 120 150">
+          <rect x="10" y="10" width="100" height="130" fill="white" opacity=".04" stroke="white" stroke-width=".8" />
+          <circle cx="60" cy="60" r="28" stroke="white" stroke-width=".8" fill="none" />
+          <line x1="20" y1="105" x2="100" y2="105" stroke="white" stroke-width=".5" />
+        </svg>
+      </div>
+      <div class="card-overlay">
+        <p class="card-cat" data-edit="PortfolioProject_4_Cat">Poster Design</p>
+        <p class="card-title" data-edit="PortfolioProject_4_Title">Campaign Series</p>
+        <p class="card-cta" data-edit="PortfolioProject_4_CTA">View Project →</p>
+      </div>
+      <div class="card-arrow">↗</div>
+      <div class="card-desc" style="display:none;" data-edit="PortfolioProject_4_Desc">A series of five interconnected campaign posters designed for maximum visual impact. Bold compositions with restrained colour palettes create a unified yet dynamic system.</div>
+      <div class="card-gallery" style="display:none;" data-gallery=""></div>
+      <div class="card-ph" style="display:none;" data-ph="ph-5"></div>
+    </div>
+
+    <div class="project-card" data-category="editorial" data-index="5">
+      <div class="card-placeholder ph-6">
+        <svg class="p-art" width="180" height="140" viewBox="0 0 180 140">
+          <rect x="10" y="10" width="160" height="120" stroke="white" stroke-width=".8" fill="none" />
+          <line x1="90" y1="10" x2="90" y2="130" stroke="white" stroke-width=".5" />
+          <rect x="20" y="25" width="55" height="6" fill="white" opacity=".35" />
+          <rect x="20" y="38" width="40" height="4" fill="white" opacity=".2" />
+          <rect x="100" y="25" width="60" height="50" fill="white" opacity=".06" />
+        </svg>
+      </div>
+      <div class="card-overlay">
+        <p class="card-cat" data-edit="PortfolioProject_5_Cat">Editorial</p>
+        <p class="card-title" data-edit="PortfolioProject_5_Title">Magazine Layout System</p>
+        <p class="card-cta" data-edit="PortfolioProject_5_CTA">View Project →</p>
+      </div>
+      <div class="card-arrow">↗</div>
+      <div class="card-desc" style="display:none;" data-edit="PortfolioProject_5_Desc">A flexible editorial grid system designed for a quarterly lifestyle magazine. Modular templates allow for creative variation while maintaining brand consistency across every issue.</div>
+      <div class="card-gallery" style="display:none;" data-gallery=""></div>
+      <div class="card-ph" style="display:none;" data-ph="ph-6"></div>
+    </div>
+
+    <div class="project-card" data-category="3d-visual" data-index="6">
+      <div class="card-placeholder ph-1">
+        <svg class="p-art" width="160" height="160" viewBox="0 0 160 160">
+          <circle cx="80" cy="80" r="55" stroke="white" stroke-width=".8" fill="none" />
+          <ellipse cx="80" cy="80" rx="55" ry="20" stroke="white" stroke-width=".5" fill="none" />
+          <line x1="80" y1="25" x2="80" y2="135" stroke="white" stroke-width=".5" />
+        </svg>
+      </div>
+      <div class="card-overlay">
+        <p class="card-cat" data-edit="PortfolioProject_6_Cat">3D Visual</p>
+        <p class="card-title" data-edit="PortfolioProject_6_Title">Concept Rendering Suite</p>
+        <p class="card-cta" data-edit="PortfolioProject_6_CTA">View Project →</p>
+      </div>
+      <div class="card-arrow">↗</div>
+      <div class="card-desc" style="display:none;" data-edit="PortfolioProject_6_Desc">A collection of concept renders exploring material studies, lighting techniques, and spatial compositions — pushing the boundary between digital art and commercial visualization.</div>
+      <div class="card-gallery" style="display:none;" data-gallery=""></div>
+      <div class="card-ph" style="display:none;" data-ph="ph-1"></div>
+    </div>
+
+    <div class="project-card" data-category="graphic-design" data-index="7">
+      <div class="card-placeholder ph-3">
+        <svg class="p-art" width="140" height="140" viewBox="0 0 140 140">
+          <rect x="20" y="20" width="100" height="100" stroke="white" stroke-width="1" fill="none" />
+          <rect x="40" y="40" width="60" height="60" stroke="white" stroke-width=".5" fill="white" opacity=".05" />
+          <line x1="0" y1="70" x2="140" y2="70" stroke="white" stroke-width=".3" />
+          <line x1="70" y1="0" x2="70" y2="140" stroke="white" stroke-width=".3" />
+        </svg>
+      </div>
+      <div class="card-overlay">
+        <p class="card-cat" data-edit="PortfolioProject_7_Cat">Branding</p>
+        <p class="card-title" data-edit="PortfolioProject_7_Title">Visual Identity Refresh</p>
+        <p class="card-cta" data-edit="PortfolioProject_7_CTA">View Project →</p>
+      </div>
+      <div class="card-arrow">↗</div>
+      <div class="card-desc" style="display:none;" data-edit="PortfolioProject_7_Desc">A thoughtful evolution of an established brand — modernising the visual language while preserving brand equity. Updated logo, extended colour system, and refreshed collateral.</div>
+      <div class="card-gallery" style="display:none;" data-gallery=""></div>
+      <div class="card-ph" style="display:none;" data-ph="ph-3"></div>
+    </div>
+
+    <div class="project-card" data-category="3d-visual" data-index="8">
+      <div class="card-placeholder ph-5">
+        <svg class="p-art" width="180" height="140" viewBox="0 0 180 140">
+          <polygon points="90,10 170,45 170,105 90,130 10,105 10,45" stroke="white" stroke-width=".8" fill="none" />
+          <line x1="90" y1="10" x2="90" y2="130" stroke="white" stroke-width=".4" />
+          <line x1="10" y1="45" x2="170" y2="105" stroke="white" stroke-width=".4" />
+          <line x1="170" y1="45" x2="10" y2="105" stroke="white" stroke-width=".4" />
+        </svg>
+      </div>
+      <div class="card-overlay">
+        <p class="card-cat" data-edit="PortfolioProject_8_Cat">3D Visual</p>
+        <p class="card-title" data-edit="PortfolioProject_8_Title">Architectural Walkthrough</p>
+        <p class="card-cta" data-edit="PortfolioProject_8_CTA">View Project →</p>
+      </div>
+      <div class="card-arrow">↗</div>
+      <div class="card-desc" style="display:none;" data-edit="PortfolioProject_8_Desc">An immersive 3D walkthrough of a residential development project. Realistic lighting, materials, and landscaping bring the space to life before construction begins.</div>
+      <div class="card-gallery" style="display:none;" data-gallery=""></div>
+      <div class="card-ph" style="display:none;" data-ph="ph-5"></div>
+    </div>
+
+    <div class="project-card" data-category="graphic-design" data-index="9">
+      <img src="MATERNITY HEADER.png" class="card-img" alt="Maternity Campaign 2026">
+      <div class="card-overlay">
+        <p class="card-cat" data-edit="PortfolioProject_9_Cat">Graphic Design</p>
+        <p class="card-title" data-edit="PortfolioProject_9_Title">Maternity Campaign 2026</p>
+        <p class="card-cta" data-edit="PortfolioProject_9_CTA">View Project →</p>
+      </div>
+      <div class="card-arrow">↗</div>
+      <div class="card-desc" style="display:none;" data-edit="PortfolioProject_9_Desc"><p style="font-size: 1.1em; color: #fff; margin-top: -0.5rem; margin-bottom: 1.5rem;">for KPJ Penang Specialist Hospital</p><p>A cohesive healthcare campaign designed to promote maternity packages through a clear and emotionally engaging visual system. The project focuses on building trust, clarity, and premium perception within a medical context.</p><p>The campaign consists of three key visuals representing different service tiers:</p><ul><li>Normal Delivery</li><li>Elective Caesarean</li><li>Emergency Caesarean</li></ul><p>Each visual maintains a consistent layout structure while using distinct color accents to differentiate the package types.</p><p><strong>Design Direction:</strong></p><ul><li>Clean and modern healthcare aesthetic</li><li>Soft, warm, and emotional tone</li><li>Strong typography hierarchy for pricing and information clarity</li><li>Consistent grid system across all visuals</li><li>Balanced composition between image and information</li></ul></div>
+      <div class="card-gallery" style="display:none;" data-gallery="MATERNITY1.jpg,MATERNITY2.jpg,MATERNITY3.jpg"></div>
+      <div class="card-ph" style="display:none;" data-ph="ph-2"></div>
+    </div>
+
   </div>
 
   <!-- MODAL -->
-  <div class="modal-overlay" id="projectModal">
+  <div class="modal-overlay" id="modal">
     <button class="modal-close" id="modalClose">✕</button>
     <div class="modal-content">
       <div class="modal-hero" id="modalHero"></div>
       <p class="modal-cat" id="modalCat"></p>
       <h2 class="modal-title" id="modalTitle"></h2>
-      <p class="modal-desc" id="modalDesc"></p>
+      <div class="modal-desc" id="modalDesc"></div>
       <div class="modal-gallery" id="modalGallery"></div>
     </div>
   </div>
 
   <!-- FOOTER -->
   <footer>
-    <p class="footer-copy">© 2025 NA Artistry. Premium Visual Solutions.</p>
+    <p class="footer-copy" data-edit="PortfolioFooter_Copyright">© 2025 NA Artistry. All rights reserved.</p>
   </footer>
 
-  <script src="./cms-data.js"></script>
-  <script src="./cms.js"></script>
-  <script src="./layout-engine.js"></script>
-  <script src="./layout-editor.js"></script>
-  
+  <script src="cms.js"></script>
   <script>
-    // ── PROJECT MODAL LOGIC ──
-    const modal = document.getElementById('projectModal');
-    const modalHero = document.getElementById('modalHero');
-    const modalCat = document.getElementById('modalCat');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalDesc = document.getElementById('modalDesc');
-    const modalGallery = document.getElementById('modalGallery');
-    const modalClose = document.getElementById('modalClose');
-
-    function openModal(data) {
-      modalHero.innerHTML = `<img src="${data.img}" alt="${data.title}">`;
-      modalCat.innerText = data.cat;
-      modalTitle.innerText = data.title;
-      modalDesc.innerText = data.desc;
-      
-      modalGallery.innerHTML = '';
-      if (data.gallery && data.gallery.length > 0) {
-        data.gallery.forEach(src => {
-          if (!src) return;
-          const item = document.createElement('div');
-          item.className = 'modal-gallery-item';
-          item.innerHTML = `<img src="${src.trim()}" alt="Gallery image" loading="lazy">`;
-          modalGallery.appendChild(item);
-        });
-      }
-      
-      modal.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeModal() {
-      modal.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-
-    document.addEventListener('click', (e) => {
-      const card = e.target.closest('.project-card');
-      if (card) {
-        const data = {
-          img: card.querySelector('img').src,
-          cat: card.querySelector('.card-cat').innerText,
-          title: card.querySelector('.card-title').innerText,
-          desc: card.querySelector('.card-desc').innerText,
-          gallery: card.querySelector('.card-gallery').getAttribute('data-gallery').split(',')
-        };
-        openModal(data);
-      }
-    });
-
-    modalClose.addEventListener('click', closeModal);
-    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-
-    // ── FILTERS ──
+    // Filter logic
     const filterBtns = document.querySelectorAll('.filter-btn');
     const cards = document.querySelectorAll('.project-card');
 
     filterBtns.forEach(btn => {
       btn.addEventListener('click', () => {
-        const filter = btn.getAttribute('data-filter');
         filterBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-
+        const filter = btn.dataset.filter;
         cards.forEach(card => {
-          if (filter === 'all' || card.getAttribute('data-category') === filter) {
-            card.style.display = 'block';
-            setTimeout(() => card.classList.add('visible'), 10);
+          const match = filter === 'all' || card.dataset.category === filter;
+          if (match) {
+            card.classList.remove('hidden');
+            setTimeout(() => card.classList.add('visible'), 50);
           } else {
             card.classList.remove('visible');
-            setTimeout(() => card.style.display = 'none', 500);
+            setTimeout(() => card.classList.add('hidden'), 400);
           }
         });
       });
     });
 
-    // ── CURSOR ──
-    const cursorDot = document.getElementById('cursorDot');
-    if (window.matchMedia('(pointer:fine)').matches && cursorDot) {
-      document.addEventListener('mousemove', e => {
-        cursorDot.style.left = e.clientX - 4 + 'px';
-        cursorDot.style.top = e.clientY - 4 + 'px';
-      });
-      document.querySelectorAll('a, button').forEach(el => {
-        el.addEventListener('mouseenter', () => cursorDot.classList.add('hover'));
-        el.addEventListener('mouseleave', () => cursorDot.classList.remove('hover'));
-      });
-    }
-
-    // ── REVEAL ──
-    const observer = new IntersectionObserver((entries) => {
+    // Scroll reveal
+    const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    }, { threshold: .1, rootMargin: '0px 0px -40px 0px' });
+    cards.forEach(c => observer.observe(c));
+
+    // Modal
+    const modal = document.getElementById('modal');
+    const modalClose = document.getElementById('modalClose');
+
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        const cat = card.querySelector('.card-cat').textContent;
+        const title = card.querySelector('.card-title').textContent;
+        const desc = card.querySelector('.card-desc').innerHTML;
+        const ph = card.querySelector('.card-ph').dataset.ph;
+        const galleryRaw = card.querySelector('.card-gallery').dataset.gallery;
+        const galleryArr = galleryRaw ? galleryRaw.split(',').filter(s => s.trim() !== "") : [];
+
+        document.getElementById('modalCat').textContent = cat;
+        document.getElementById('modalTitle').textContent = title;
+        document.getElementById('modalDesc').innerHTML = desc;
+        
+        // Clone the SVG or image from card into modal hero
+        const heroEl = document.getElementById('modalHero');
+        heroEl.className = 'modal-hero ' + ph;
+        const svg = card.querySelector('.p-art');
+        const img = card.querySelector('.card-img');
+        if (img) {
+          heroEl.innerHTML = `<img src="${img.getAttribute('src')}" alt="${img.getAttribute('alt')}">`;
+        } else {
+          heroEl.innerHTML = svg ? svg.outerHTML.replace('class="p-art"', 'class="p-art" style="opacity:.15;width:40%;height:auto"') : '';
+        }
+        // Gallery placeholders or images
+        const gallery = document.getElementById('modalGallery');
+        gallery.innerHTML = '';
+        
+        if (galleryArr.length > 0) {
+          gallery.style.gridTemplateColumns = galleryArr.length === 3 ? 'repeat(3, 1fr)' : '1fr 1fr';
+          galleryArr.forEach((src, i) => {
+            const item = document.createElement('div');
+            item.className = 'modal-gallery-item';
+            const gImg = document.createElement('img');
+            gImg.src = src;
+            gImg.alt = title + ' gallery ' + (i + 1);
+            item.appendChild(gImg);
+            gallery.appendChild(item);
+          });
+        } else {
+          gallery.style.gridTemplateColumns = '1fr 1fr';
+          for (let i = 0; i < 4; i++) {
+            const item = document.createElement('div');
+            item.className = 'modal-gallery-item ' + ['ph-1', 'ph-2', 'ph-3', 'ph-4'][i];
+            gallery.appendChild(item);
+          }
+        }
+        
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      });
+    });
+
+    modalClose.addEventListener('click', () => {
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+    modal.addEventListener('click', e => {
+      if (e.target === modal) { modal.classList.remove('open'); document.body.style.overflow = ''; }
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && modal.classList.contains('open')) { modal.classList.remove('open'); document.body.style.overflow = ''; }
+    });
+
+    // Custom cursor
+    const dot = document.getElementById('cursorDot');
+    if (window.matchMedia('(pointer:fine)').matches) {
+      document.addEventListener('mousemove', e => { dot.style.left = e.clientX - 4 + 'px'; dot.style.top = e.clientY - 4 + 'px'; });
+      document.querySelectorAll('.project-card, .filter-btn, a, button').forEach(el => {
+        el.addEventListener('mouseenter', () => dot.classList.add('hover'));
+        el.addEventListener('mouseleave', () => dot.classList.remove('hover'));
+      });
+    } else { dot.style.display = 'none'; }
   </script>
 </body>
+
 </html>
