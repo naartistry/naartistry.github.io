@@ -412,7 +412,7 @@ nav {
 }
 
 .modal-gallery-item {
-  aspect-ratio: 210/297; /* A4 size ratio */
+  aspect-ratio: 1/1;
   background: var(--gray-dark);
   overflow: hidden;
   display: flex;
