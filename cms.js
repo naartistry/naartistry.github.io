@@ -12,22 +12,38 @@
             
             // Register in schema if not exists
             if (!cmsSchema[key]) {
-                // Determine section from key (e.g. "Hero_Title" -> "Hero")
                 let section = 'General';
-                if (key.includes('_')) {
-                    section = key.split('_')[0];
+                if (key.includes('_')) section = key.split('_')[0];
+                
+                let defaultVal = el.innerHTML.trim();
+                let type = 'text';
+
+                if (el.tagName === 'IMG') {
+                    defaultVal = el.getAttribute('src');
+                    type = 'image';
+                } else if (el.getAttribute('data-cms-type') === 'image' || el.style.backgroundImage) {
+                    const bgMatch = el.style.backgroundImage.match(/url\(['"]?(.*?)['"]?\)/);
+                    defaultVal = bgMatch ? bgMatch[1] : '';
+                    type = 'image';
                 }
                 
                 cmsSchema[key] = {
-                    default: el.innerHTML.trim(),
-                    section: section
+                    default: defaultVal,
+                    section: section,
+                    type: type
                 };
                 schemaUpdated = true;
             }
 
             // Apply content if exists in overrides
             if (cmsContent[key] !== undefined && cmsContent[key] !== null && cmsContent[key] !== '') {
-                el.innerHTML = cmsContent[key];
+                if (el.tagName === 'IMG') {
+                    el.setAttribute('src', cmsContent[key]);
+                } else if (el.getAttribute('data-cms-type') === 'image' || cmsSchema[key].type === 'image') {
+                    el.style.backgroundImage = `url('${cmsContent[key]}')`;
+                } else {
+                    el.innerHTML = cmsContent[key];
+                }
             }
         });
 
@@ -36,6 +52,64 @@
         }
     }
 
+    // 2.5 Media Upload Helper (Cloudinary)
+    async function loadCloudinary() {
+        if (window.cloudinary) return window.cloudinary;
+        return new Promise((resolve) => {
+            const script = document.createElement('script');
+            script.src = 'https://upload-widget.cloudinary.com/global/all.js';
+            script.onload = () => resolve(window.cloudinary);
+            document.head.appendChild(script);
+        });
+    }
+
+    window.triggerImageUpload = async function(key, callback) {
+        const cloudinary = await loadCloudinary();
+        const config = window.NA_MEDIA_CONFIG || { cloudinary: { cloudName: 'demo', uploadPreset: 'ml_default' } };
+        
+        const myWidget = cloudinary.createUploadWidget({
+            cloudName: config.cloudinary.cloudName,
+            uploadPreset: config.cloudinary.uploadPreset,
+            sources: ['local', 'url', 'camera', 'google_drive', 'dropbox'],
+            multiple: false,
+            cropping: true,
+            showAdvancedOptions: true,
+            styles: {
+                palette: {
+                    window: "#000000",
+                    windowBorder: "#222222",
+                    tabIcon: "#FFFFFF",
+                    menuIcons: "#888888",
+                    textDark: "#000000",
+                    textLight: "#FFFFFF",
+                    link: "#FFFFFF",
+                    action: "#FFFFFF",
+                    inactiveTabIcon: "#444444",
+                    error: "#F44235",
+                    inProgress: "#FFFFFF",
+                    complete: "#20B832",
+                    sourceBg: "#111111"
+                }
+            }
+        }, (error, result) => {
+            if (!error && result && result.event === "success") {
+                const url = result.info.secure_url;
+                cmsContent[key] = url;
+                localStorage.setItem('na_cms_content', JSON.stringify(cmsContent));
+                
+                // Update DOM elements matching the key
+                document.querySelectorAll(`[data-edit="${key}"]`).forEach(el => {
+                    if (el.tagName === 'IMG') el.setAttribute('src', url);
+                    else el.innerHTML = url; // Fallback
+                });
+
+                if (callback) callback(url);
+                console.log('NA Media: Upload successful ->', url);
+            }
+        });
+        myWidget.open();
+    };
+
     // Run on DOMContentLoaded or immediately if already loaded
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initCMS);
@@ -43,11 +117,11 @@
         initCMS();
     }
 
-    // Listen for storage events (e.g. when Admin saves changes in another tab)
+    // Listen for storage events
     window.addEventListener('storage', (e) => {
         if (e.key === 'na_cms_content') {
             cmsContent = JSON.parse(e.newValue) || {};
-            initCMS(); // Re-apply changes
+            initCMS();
         }
     });
 
@@ -123,16 +197,20 @@
                     e.stopPropagation();
                     
                     const key = target.getAttribute('data-edit');
-                    const currentVal = cmsContent[key] !== undefined && cmsContent[key] !== '' ? cmsContent[key] : (cmsSchema[key] ? cmsSchema[key].default : '');
                     
-                    const newVal = window.prompt(`Edit content for [${key}]:\n(HTML is supported)`, currentVal);
-                    if (newVal !== null) {
-                        cmsContent[key] = newVal;
-                        localStorage.setItem('na_cms_content', JSON.stringify(cmsContent));
-                        target.innerHTML = newVal;
+                    if (target.tagName === 'IMG' || target.getAttribute('data-cms-type') === 'image') {
+                        window.triggerImageUpload(key);
+                    } else {
+                        const currentVal = cmsContent[key] !== undefined && cmsContent[key] !== '' ? cmsContent[key] : (cmsSchema[key] ? cmsSchema[key].default : '');
+                        const newVal = window.prompt(`Edit content for [${key}]:\n(HTML is supported)`, currentVal);
+                        if (newVal !== null) {
+                            cmsContent[key] = newVal;
+                            localStorage.setItem('na_cms_content', JSON.stringify(cmsContent));
+                            target.innerHTML = newVal;
+                        }
                     }
                 }
-            }, true); // use capture to intercept clicks on links
+            }, true);
         });
     }
 })();

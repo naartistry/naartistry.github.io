@@ -22,9 +22,9 @@
             mobile: '@media (max-width: 768px)'
         };
 
-        // Reset baseline for elements with data-layout to ensure variables are supported
-        css += `[data-layout] { transition: width 0.3s ease, height 0.3s ease, transform 0.3s ease, border-radius 0.3s ease; overflow: hidden; }\n`;
-        css += `[data-layout] img, [data-layout] video { width: 100% !important; height: 100% !important; object-fit: inherit !important; object-position: inherit !important; display: block; }\n`;
+        // Global base for layout elements
+        css += `[data-layout] { transition: width 0.3s ease, height 0.3s ease, transform 0.3s ease, border-radius 0.3s ease, opacity 0.3s ease; }\n`;
+        css += `[data-layout] img, [data-layout] video { width: 100% !important; height: 100% !important; object-fit: cover; object-position: center; display: block; }\n`;
 
         for (const [key, config] of Object.entries(overrides)) {
             for (const [bp, styles] of Object.entries(config)) {
@@ -34,10 +34,10 @@
                 for (const [prop, val] of Object.entries(styles)) {
                     if (val === undefined || val === null || val === '') continue;
                     
-                    // Convert camelCase to kebab-case (e.g., objectFit -> object-fit)
+                    // Convert camelCase to kebab-case
                     const kebabProp = prop.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
                     
-                    // Ensure focal point is mapped correctly
+                    // Focal point mapping
                     const finalProp = kebabProp === 'focal-point' ? 'object-position' : kebabProp;
                     
                     css += `    ${finalProp}: ${val} !important;\n`;
