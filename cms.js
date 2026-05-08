@@ -1,7 +1,13 @@
 (function() {
     // 1. Initialize Schema & Content
-    let cmsContent = JSON.parse(localStorage.getItem('na_cms_content')) || {};
+    const publishedContent = window.NA_PUBLISHED_CONTENT || {};
+    const localContent = JSON.parse(localStorage.getItem('na_cms_content')) || {};
+    
+    // Merge: Local storage (drafts) takes precedence for the admin
+    let cmsContent = { ...publishedContent, ...localContent };
+    
     let cmsSchema = JSON.parse(localStorage.getItem('na_cms_schema')) || {};
+
     let schemaUpdated = false;
 
     // 2. Scan DOM and apply content
@@ -37,12 +43,20 @@
 
             // Apply content if exists in overrides
             if (cmsContent[key] !== undefined && cmsContent[key] !== null && cmsContent[key] !== '') {
+                let val = cmsContent[key];
+                
+                // Optimize Cloudinary URLs
+                if (val.includes('cloudinary.com') && !val.includes('f_auto')) {
+                    val = val.replace('/upload/', '/upload/f_auto,q_auto/');
+                }
+
                 if (el.tagName === 'IMG') {
-                    el.setAttribute('src', cmsContent[key]);
+                    el.setAttribute('src', val);
+                    el.setAttribute('loading', 'lazy');
                 } else if (el.getAttribute('data-cms-type') === 'image' || cmsSchema[key].type === 'image') {
-                    el.style.backgroundImage = `url('${cmsContent[key]}')`;
+                    el.style.backgroundImage = `url('${val}')`;
                 } else {
-                    el.innerHTML = cmsContent[key];
+                    el.innerHTML = val;
                 }
             }
         });

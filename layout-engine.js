@@ -1,6 +1,11 @@
 (function() {
     const STORAGE_KEY = 'na_layout_overrides';
-    let overrides = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    const publishedOverrides = window.NA_PUBLISHED_LAYOUT || {};
+    const localOverrides = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    
+    // Merge: Local overrides (drafts) take precedence
+    let overrides = { ...publishedOverrides, ...localOverrides };
+
 
     /**
      * Applies the stored layout overrides by injecting a dynamic <style> tag.
