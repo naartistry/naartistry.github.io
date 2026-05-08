@@ -29,7 +29,6 @@
 
         // Global base for layout elements
         css += `[data-layout] { transition: width 0.3s ease, height 0.3s ease, transform 0.3s ease, border-radius 0.3s ease, opacity 0.3s ease; }\n`;
-        css += `[data-layout] img, [data-layout] video { width: 100% !important; height: 100% !important; object-fit: cover; object-position: center; display: block; }\n`;
 
         for (const [key, config] of Object.entries(overrides)) {
             for (const [bp, styles] of Object.entries(config)) {

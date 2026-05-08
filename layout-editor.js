@@ -16,6 +16,8 @@
         });
     }
 
+    if (localStorage.getItem('na_admin_logged_in') !== 'true') return;
+
     try {
         await loadScript('media-config.js');
         await loadScript('https://cdn.tailwindcss.com');
@@ -29,7 +31,6 @@
         if (!window.framerMotion) {
             await loadScript('https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js');
         }
-        // Load Lucide Icons
         await loadScript('https://unpkg.com/lucide@latest');
         
         console.log("NA Advanced Editor: Dependencies loaded.");
