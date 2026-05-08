@@ -245,6 +245,7 @@
 
             <div class="actions">
                 <button class="btn-save" onclick="saveAll()">Save Changes</button>
+                <button class="btn-save" onclick="exportConfig()" style="background: #f39c12; color: #fff;">Export Published Config</button>
                 <button class="btn-reset" onclick="resetDefaults()">Reset to Defaults</button>
                 <button class="btn-reset" onclick="logout()" style="color: #e74c3c; border-color: rgba(231, 76, 60, 0.2);">Logout</button>
                 <a href="index.html" target="_blank"
@@ -387,6 +388,31 @@
             const toast = document.getElementById('toast');
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function exportConfig() {
+            saveAll();
+            const layout = localStorage.getItem('na_layout_overrides') || '{}';
+            const content = localStorage.getItem('na_cms_content') || '{}';
+            
+            const code = `/**
+ * NA Artistry - Published CMS & Layout Configuration
+ * Copy this content and paste it into cms-data.js to publish changes.
+ */
+
+window.NA_PUBLISHED_CONTENT = ${JSON.stringify(cmsContent, null, 4)};
+
+window.NA_PUBLISHED_LAYOUT = ${JSON.stringify(JSON.parse(layout), null, 4)};
+`;
+            
+            const blob = new Blob([code], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'cms-data.js';
+            a.click();
+            
+            alert("Configuration exported as 'cms-data.js'. Replace the existing file in your repository with this one to publish changes to all visitors.");
         }
 
         function resetDefaults() {
