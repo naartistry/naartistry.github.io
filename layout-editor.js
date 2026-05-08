@@ -73,18 +73,32 @@
             if (!target) return;
             const moveable = new window.Moveable(document.body, {
                 target: target,
-                draggable: true, resizable: true, rotatable: true,
-                snappable: true, snapThreshold: 5,
+                draggable: true, 
+                resizable: true, 
+                scalable: true, // Enabled scaling
+                rotatable: true,
+                snappable: true, 
+                snapThreshold: 5,
                 elementGuidelines: Array.from(document.querySelectorAll('[data-layout]')),
-                snapElement: true, snapVertical: true, snapHorizontal: true,
+                snapElement: true, 
+                snapVertical: true, 
+                snapHorizontal: true,
             });
+
             moveable.on("drag", ({ target, transform }) => {
                 target.style.transform = transform;
                 updateOverride(selectedKey, { transform });
             }).on("resize", ({ target, width, height, drag }) => {
-                target.style.width = `${width}px`; target.style.height = `${height}px`;
+                target.style.width = `${width}px`; 
+                target.style.height = `${height}px`;
                 target.style.transform = drag.transform;
                 updateOverride(selectedKey, { width: `${width}px`, height: `${height}px`, transform: drag.transform });
+            }).on("scale", ({ target, transform }) => {
+                target.style.transform = transform;
+                updateOverride(selectedKey, { transform });
+            }).on("rotate", ({ target, transform }) => {
+                target.style.transform = transform;
+                updateOverride(selectedKey, { transform });
             });
             moveableRef.current = moveable;
             return () => moveable.destroy();
