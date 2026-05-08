@@ -36,12 +36,30 @@
 </head>
 
 <body>
-  <!-- PRELOADER -->
-  <div id="preloader" style="position:fixed; inset:0; background:#000; z-index:10000; display:flex; align-items:center; justify-content:center; transition: opacity 0.6s var(--ease);">
-      <div style="width:40px; height:40px; border:2px solid rgba(255,255,255,0.1); border-top-color:#fff; border-radius:50%; animation: spin 1s linear infinite;"></div>
+  <!-- PRELOADER — fail-safe triple-redundancy system -->
+  <div id="preloader" style="position:fixed; inset:0; background:#000; z-index:10000; display:flex; align-items:center; justify-content:center; transition: opacity 0.6s ease;">
+    <div style="width:36px; height:36px; border:1.5px solid rgba(255,255,255,0.1); border-top-color:#fff; border-radius:50%; animation: na-spin 0.9s linear infinite;"></div>
   </div>
-  <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
-  <script>window.addEventListener('load', () => { const p = document.getElementById('preloader'); p.style.opacity = '0'; setTimeout(() => p.remove(), 600); });</script>
+  <style>@keyframes na-spin { to { transform: rotate(360deg); } }</style>
+  <script>
+    (function() {
+      var gone = false;
+      function hidePreloader() {
+        if (gone) return;
+        gone = true;
+        var p = document.getElementById('preloader');
+        if (!p) return;
+        p.style.opacity = '0';
+        setTimeout(function() { if (p && p.parentNode) p.parentNode.removeChild(p); }, 650);
+      }
+      // Trigger 1: DOMContentLoaded (fast path)
+      document.addEventListener('DOMContentLoaded', function() { setTimeout(hidePreloader, 200); });
+      // Trigger 2: window.load (normal path)
+      window.addEventListener('load', hidePreloader);
+      // Trigger 3: Hard timeout failsafe — ALWAYS fires after 2.5s
+      setTimeout(hidePreloader, 2500);
+    })();
+  </script>
 
   <div class="cursor-dot" id="cursorDot"></div>
 
@@ -383,103 +401,151 @@
   </a>
 
   <script>
-    // ── STICKY NAV ──
-    const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 60) navbar.classList.add('scrolled');
-      else navbar.classList.remove('scrolled');
-    }, { passive: true });
+    (function() {
+      'use strict';
 
-    // ── HAMBURGER ──
-    const hamburger = document.getElementById('hamburger');
-    const mobileMenu = document.getElementById('mobileMenu');
-    hamburger.addEventListener('click', () => {
-      hamburger.classList.toggle('open');
-      mobileMenu.classList.toggle('open');
-      document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
-    });
-    document.querySelectorAll('.mobile-link').forEach(link => {
-      link.addEventListener('click', () => {
-        hamburger.classList.remove('open');
-        mobileMenu.classList.remove('open');
-        document.body.style.overflow = '';
-      });
-    });
-
-    // ── SCROLL REVEAL ──
-    const revealEls = document.querySelectorAll('.reveal');
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
+      // ── STICKY NAV ──
+      try {
+        var navbar = document.getElementById('navbar');
+        if (navbar) {
+          window.addEventListener('scroll', function() {
+            if (window.scrollY > 60) navbar.classList.add('scrolled');
+            else navbar.classList.remove('scrolled');
+          }, { passive: true });
         }
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-    revealEls.forEach(el => observer.observe(el));
+      } catch(e) { console.warn('Nav init failed:', e); }
 
-    // ── CUSTOM CURSOR ──
-    const cursorDot = document.getElementById('cursorDot');
-    if (window.matchMedia('(pointer:fine)').matches && cursorDot) {
-      document.addEventListener('mousemove', e => {
-        cursorDot.style.left = e.clientX - 4 + 'px';
-        cursorDot.style.top = e.clientY - 4 + 'px';
-      });
-      document.querySelectorAll('a, button, .dot').forEach(el => {
-        el.addEventListener('mouseenter', () => cursorDot.classList.add('hover'));
-        el.addEventListener('mouseleave', () => cursorDot.classList.remove('hover'));
-      });
-    } else if (cursorDot) {
-      cursorDot.style.display = 'none';
-    }
+      // ── HAMBURGER ──
+      try {
+        var hamburger = document.getElementById('hamburger');
+        var mobileMenu = document.getElementById('mobileMenu');
+        if (hamburger && mobileMenu) {
+          hamburger.addEventListener('click', function() {
+            hamburger.classList.toggle('open');
+            mobileMenu.classList.toggle('open');
+            document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+          });
+          document.querySelectorAll('.mobile-link').forEach(function(link) {
+            link.addEventListener('click', function() {
+              hamburger.classList.remove('open');
+              mobileMenu.classList.remove('open');
+              document.body.style.overflow = '';
+            });
+          });
+        }
+      } catch(e) { console.warn('Hamburger init failed:', e); }
 
-    // ── HERO SLIDER ──
-    const heroSlider = document.getElementById('hero');
-    if (heroSlider) {
-      const slides = heroSlider.querySelectorAll('.hero-slide');
-      const dots = heroSlider.querySelectorAll('.dot');
-      let currentSlide = 0;
-      let slideInterval;
-      const slideDuration = 6000;
+      // ── SCROLL REVEAL ──
+      try {
+        if ('IntersectionObserver' in window) {
+          var revealObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                revealObserver.unobserve(entry.target);
+              }
+            });
+          }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+          document.querySelectorAll('.reveal').forEach(function(el) {
+            revealObserver.observe(el);
+          });
+        } else {
+          // Fallback: show all reveals immediately if no IntersectionObserver
+          document.querySelectorAll('.reveal').forEach(function(el) {
+            el.classList.add('visible');
+          });
+        }
+      } catch(e) {
+        console.warn('Reveal init failed:', e);
+        document.querySelectorAll('.reveal').forEach(function(el) { el.classList.add('visible'); });
+      }
 
-      const goToSlide = (index) => {
-        slides[currentSlide].classList.remove('active');
-        dots[currentSlide].classList.remove('active');
-        currentSlide = index;
-        slides[currentSlide].classList.add('active');
-        dots[currentSlide].classList.add('active');
-      };
+      // ── CUSTOM CURSOR ──
+      try {
+        var cursorDot = document.getElementById('cursorDot');
+        if (cursorDot && window.matchMedia('(pointer:fine)').matches) {
+          document.addEventListener('mousemove', function(e) {
+            cursorDot.style.left = (e.clientX - 4) + 'px';
+            cursorDot.style.top = (e.clientY - 4) + 'px';
+          });
+          document.querySelectorAll('a, button, .dot').forEach(function(el) {
+            el.addEventListener('mouseenter', function() { cursorDot.classList.add('hover'); });
+            el.addEventListener('mouseleave', function() { cursorDot.classList.remove('hover'); });
+          });
+        } else if (cursorDot) {
+          cursorDot.style.display = 'none';
+        }
+      } catch(e) { console.warn('Cursor init failed:', e); }
 
-      const nextSlide = () => {
-        goToSlide((currentSlide + 1) % slides.length);
-      };
+      // ── HERO SLIDER ──
+      try {
+        var heroSlider = document.getElementById('hero');
+        if (heroSlider) {
+          var slides = heroSlider.querySelectorAll('.hero-slide');
+          var dots = heroSlider.querySelectorAll('.dot');
+          if (slides.length > 0) {
+            var currentSlide = 0;
+            var slideInterval = null;
+            var slideDuration = 6000;
 
-      const startSlideShow = () => {
-        slideInterval = setInterval(nextSlide, slideDuration);
-      };
+            var goToSlide = function(index) {
+              slides[currentSlide].classList.remove('active');
+              if (dots[currentSlide]) dots[currentSlide].classList.remove('active');
+              currentSlide = index;
+              slides[currentSlide].classList.add('active');
+              if (dots[currentSlide]) dots[currentSlide].classList.add('active');
+            };
 
-      const stopSlideShow = () => {
-        clearInterval(slideInterval);
-      };
+            var startSlideShow = function() {
+              slideInterval = setInterval(function() {
+                goToSlide((currentSlide + 1) % slides.length);
+              }, slideDuration);
+            };
 
-      dots.forEach((dot, index) => {
-        dot.addEventListener('click', () => {
-          if (index !== currentSlide) {
-            stopSlideShow();
-            goToSlide(index);
+            var stopSlideShow = function() { clearInterval(slideInterval); };
+
+            dots.forEach(function(dot, index) {
+              dot.addEventListener('click', function() {
+                if (index !== currentSlide) {
+                  stopSlideShow();
+                  goToSlide(index);
+                  startSlideShow();
+                }
+              });
+            });
+
+            heroSlider.addEventListener('mouseenter', stopSlideShow);
+            heroSlider.addEventListener('mouseleave', startSlideShow);
             startSlideShow();
           }
-        });
-      });
+        }
+      } catch(e) { console.warn('Slider init failed:', e); }
 
-      heroSlider.addEventListener('mouseenter', stopSlideShow);
-      heroSlider.addEventListener('mouseleave', startSlideShow);
-      startSlideShow();
-    }
+    })();
   </script>
-  <script src="./cms-data.js"></script>
-  <script src="./cms.js"></script>
-  <script src="./layout-engine.js"></script>
-  <script src="./layout-editor.js"></script>
+
+  <!-- CMS & LAYOUT SCRIPTS — each wrapped so one failure can't break others -->
+  <script>
+    (function() {
+      function safeLoad(src) {
+        return new Promise(function(resolve) {
+          var s = document.createElement('script');
+          s.src = src;
+          s.onload = resolve;
+          s.onerror = function() { console.warn('Script failed to load: ' + src); resolve(); };
+          document.body.appendChild(s);
+        });
+      }
+      // Load CMS data first, then engine, then editor (non-blocking)
+      safeLoad('./cms-data.js').then(function() {
+        return safeLoad('./cms.js');
+      }).then(function() {
+        return safeLoad('./layout-engine.js');
+      }).then(function() {
+        safeLoad('./layout-editor.js');
+      });
+    })();
+  </script>
+
 </body>
 </html>
